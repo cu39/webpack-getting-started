@@ -10,6 +10,7 @@ module.exports = {
       , { test: /\.less$/, loader: "style!css!less" }
       , { test: /\.sass$/, loader: "style!css!sass?indentedSyntax" }
       , { test: /\.scss$/, loader: "style!css!sass" }
+      , { test: /\.js$/, loader: "babel" }
     ]
   }
 };
