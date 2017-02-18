@@ -48,7 +48,6 @@ gulp.task("webpack:build", function(callback) {
 // modify some webpack config options
 var myDevConfig = Object.create(webpackConfig);
 myDevConfig.devtool = "sourcemap";
-myDevConfig.debug = true;
 
 // create a single instance of the compiler to allow caching
 var devCompiler = webpack(myDevConfig);
