@@ -7,33 +7,10 @@ var webpack = require("webpack");
 var WebpackDevServer = require("webpack-dev-server");
 var webpackConfig = require("./webpack.config.js");
 
-// The development server (the recommended option for development)
-gulp.task("default", ["webpack-dev-server"]);
-
-// Build and watch cycle (another option for development)
-// Advantage: No server required, can run app from filesystem
-// Disadvantage: Requests are not blocked until bundle is available,
-//               can serve an old app on refresh
-gulp.task("build-dev", ["webpack:build-dev"], function() {
-  gulp.watch(["app/**/*"], ["webpack:build-dev"]);
-});
-
-// Production build
-gulp.task("build", ["webpack:build"]);
-
 gulp.task("webpack:build", function(callback) {
   // modify some webpack config options
-  var myConfig = Object.create(webpackConfig);
-  myConfig.plugins = myConfig.plugins.concat(
-    new webpack.DefinePlugin({
-      "process.env": {
-        // This has effect on the react lib size
-        "NODE_ENV": JSON.stringify("production")
-      }
-    }),
-    new webpack.optimize.DedupePlugin(),
-    new webpack.optimize.UglifyJsPlugin()
-  );
+  var myConfig = Object.assign({}, webpackConfig);
+  myConfig.mode = "production";
 
   // run webpack
   webpack(myConfig, function(err, stats) {
@@ -46,7 +23,8 @@ gulp.task("webpack:build", function(callback) {
 });
 
 // modify some webpack config options
-var myDevConfig = Object.create(webpackConfig);
+var myDevConfig = Object.assign({}, webpackConfig);
+myDevConfig.mode = "development";
 myDevConfig.devtool = "sourcemap";
 
 // create a single instance of the compiler to allow caching
@@ -67,11 +45,11 @@ gulp.task("webpack-dev-server", function(callback) {
   var host = "localhost";
   var port = 8000;
   var baseUrl = "http://" + host + ":" + port + "/webpack-dev-server/";
-  var compiler = webpack(webpackConfig);
+  var compiler = webpack(myDevConfig);
 
   // Start a webpack-dev-server
   var server = new WebpackDevServer(compiler, {
-    publicPath: webpackConfig.output.publicPath,
+    publicPath: myDevConfig.output.publicPath,
     stats: {
       colors: true
     }
@@ -82,3 +60,17 @@ gulp.task("webpack-dev-server", function(callback) {
     gutil.log("[webpack-dev-server]", baseUrl);
   });
 });
+
+// The development server (the recommended option for development)
+gulp.task("default", gulp.parallel("webpack-dev-server"));
+
+// Build and watch cycle (another option for development)
+// Advantage: No server required, can run app from filesystem
+// Disadvantage: Requests are not blocked until bundle is available,
+//               can serve an old app on refresh
+gulp.task("build-dev", gulp.parallel("webpack:build-dev"), function() {
+  gulp.watch(["app/**/*"], ["webpack:build-dev"]);
+});
+
+// Production build
+gulp.task("build", gulp.parallel("webpack:build"));
