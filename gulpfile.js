@@ -2,7 +2,8 @@
 // ref: https://github.com/webpack/webpack-with-common-libs/blob/master/gulpfile.js
 
 var gulp = require("gulp");
-var gutil = require("gulp-util");
+var log = require('fancy-log');
+var PluginError = require('plugin-error');
 var webpack = require("webpack");
 var WebpackDevServer = require("webpack-dev-server");
 var webpackConfig = require("./webpack.config.js");
@@ -15,7 +16,7 @@ gulp.task("webpack:build", function(callback) {
   // run webpack
   webpack(myConfig, function(err, stats) {
     if(err) throw new gutil.PluginError("webpack:build", err);
-    gutil.log("[webpack:build]", stats.toString({
+    log.error("[webpack:build]", stats.toString({
       colors: true
     }));
     callback();
@@ -33,8 +34,8 @@ var devCompiler = webpack(myDevConfig);
 gulp.task("webpack:build-dev", function(callback) {
   // run webpack
   devCompiler.run(function(err, stats) {
-    if(err) throw new gutil.PluginError("webpack:build-dev", err);
-    gutil.log("[webpack:build-dev]", stats.toString({
+    if(err) throw new PluginError("webpack:build-dev", err);
+    log.error("[webpack:build-dev]", stats.toString({
       colors: true
     }));
     callback();
@@ -56,8 +57,8 @@ gulp.task("webpack-dev-server", function(callback) {
   });
 
   server.listen(port, host, function(err) {
-    if(err) throw new gutil.PluginError("webpack-dev-server", err);
-    gutil.log("[webpack-dev-server]", baseUrl);
+    if(err) throw new PluginError("webpack-dev-server", err);
+    log.error("[webpack-dev-server]", baseUrl);
   });
 });
 
